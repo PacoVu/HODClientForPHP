@@ -63,6 +63,7 @@ HODClient class exposes source code so you can modify it as you wish.
 * This function will throw an error if the operation failed.
 
 *Example code:*
+## 
     // Call the Entity Extraction API synchronously to find people and places from CNN website.
     $paramArr = array(
         'url' => "http://www.cnn.com",
@@ -77,6 +78,7 @@ HODClient class exposes source code so you can modify it as you wish.
     function requestCompleted($response) {
         echo $response;
     }
+    
 ----
 **Function PostRequest**
  
@@ -110,6 +112,7 @@ HODClient class exposes source code so you can modify it as you wish.
 * this function will throw an error if an operation failed.
 
 *Example code:*
+## 
     // Call the OCR Document API asynchronously to scan text from an image file.
     $paramArr = array(
         'file' => "full/path/filename.jpg",
