@@ -27,8 +27,8 @@ class HODClient
 {
     private $apiKey = '';
     private $ver;
-    private $hodAppBase = 'https://api.idolondemand.com/1/api/';
-    private $hodJobResultBase = "https://api.idolondemand.com/1/job/result/";
+    private $hodAppBase = 'https://api.havenondemand.com/1/api/';
+    private $hodJobResultBase = "https://api.havenondemand.com/1/job/result/";
     private $requestTimeout = 600;
     function HODClient($apiKey, $version = "v1") {
         $this->apiKey = $apiKey;
@@ -197,9 +197,8 @@ class HODClient
     }
 }
 interface HODApps {
-    const OCR_DOCUMENT = "ocrdocument";
     const RECOGNIZE_SPEECH = "recognizespeech";
-    const ENTITY_EXTRACTION = "extractentities";
+
     const CANCEL_CONNECTOR_SCHEDULE = "cancelconnectorschedule";
     const CONNECTOR_HISTORY = "connectorhistory";
     const CONNECTOR_STATUS = "connectorstatus";
@@ -207,18 +206,28 @@ interface HODApps {
     const DELETE_CONNECTOR = "deleteconnector";
     const RETRIEVE_CONFIG = "retrieveconfig";
     const START_CONNECTOR = "startconnector";
-
     const STOP_CONNECTOR = "stopconnector";
     const UPDATE_CONNECTOR = "updateconnector";
+
     const EXPAND_CONTAINER = "expandcontainer";
     const STORE_OBJECT = "storeobject";
     const EXTRACT_TEXT = "extracttext";
     const VIEW_DOCUMENT = "viewdocument";
+
+    const OCR_DOCUMENT = "ocrdocument";
     const RECOGNIZE_BARCODES = "recognizebarcodes";
     const DETECT_FACES = "detectfaces";
     const RECOGNIZE_IMAGES = "recognizeimages";
-    const CREATE_CLASSIFICATION_OBJECTS = "createclassificationobjects";
 
+    const GET_COMMON_NEIGHBORS = "getcommonneighbors";
+    const GET_NEIGHBORS = "getneighbors";
+    const GET_NODES = "getnodes";
+    const GET_SHORTEST_PATH = "getshortestpath";
+    const GET_SUB_GRAPH = "getsubgraph";
+    const SUGGEST_LINKS = "suggestlinks";
+    const SUMMARIZE_GRAPH = "summarizegraph";
+
+    const CREATE_CLASSIFICATION_OBJECTS = "createclassificationobjects";
     const CREATE_POLICY_OBJECTS = "createpolicyobjects";
     const DELETE_CLASSIFICATION_OBJECTS = "deleteclassificationobjects";
     const DELETE_POLICY_OBJECTS = "deletepolicyobjects";
@@ -226,35 +235,39 @@ interface HODApps {
     const RETRIEVE_POLICY_OBJECTS = "retrievepolicyobjects";
     const UPDATE_CLASSIFICATION_OBJECTS = "updateclassificationobjects";
     const UPDATE_POLICY_OBJECTS = "updatepolicyobjects";
+
     const PREDICT = "predict";
     const RECOMMEND = "recommend";
     const TRAIN_PREDICTOR = "trainpredictor";
 
     const CREATE_QUERY_PROFILE = "createqueryprofile";
     const DELETE_QUERY_PROFILE = "deletequeryprofile";
+    const RETRIEVE_QUERY_PROFILE = "retrievequeryprofile";
+    const UPDATE_QUERY_PROFILE = "updatequeryprofile";
+
     const FIND_RELATED_CONCEPTS = "findrelatedconcepts";
     const FIND_SIMILAR = "findsimilar";
     const GET_CONTENT = "getcontent";
     const GET_PARAMETRIC_VALUES = "getparametricvalues";
     const QUERY_TEXT_INDEX = "querytextindex";
     const RETRIEVE_INDEX_FIELDS = "retrieveindexfields";
-    const UPDATE_QUERY_PROFILE = "updatequeryprofile";
-    const CLASSIFY_DOCUMENT = "classifydocument";
 
+    const CLASSIFY_DOCUMENT = "classifydocument";
     const EXTRACT_CONCEPTS = "extractconcepts";
     const CATEGORIZE_DOCUMENT = "categorizedocument";
+    const ENTITY_EXTRACTION = "extractentities";
     const EXPAND_TERMS = "expandterms";
     const HIGHLIGHT_TEXT = "highlighttext";
     const IDENTIFY_LANGUAGE = "identifylanguage";
     const ANALYZE_SENTIMENT = "analyzesentiment";
     const TOKENIZE_TEXT = "tokenizetext";
+
     const ADD_TO_TEXT_INDEX = "addtotextindex";
     const CREATE_TEXT_INDEX = "createtextindex";
     const DELETE_TEXT_INDEX = "deletetextindex";
-
     const DELETE_FROM_TEXT_INDEX = "deletefromtextindex";
     const INDEX_STATUS = "indexstatus";
-    const LIST_INDEXES = "listindexes";
+    //const LIST_INDEXES = "listindexes"; REMOVED
     const LIST_RESOURCES = "listresources";
     const RESTORE_TEXT_INDEX = "restoretextindex";
 }
