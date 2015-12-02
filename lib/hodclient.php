@@ -11,24 +11,13 @@ interface REQ_MODE
     const ASYNC = "async";
     const SYNC = "sync";
 }
-abstract class CallbackFunctions
-{
-    // Force Extending class to define this method
-    abstract protected function requestCompletedWithJobID($response);
-    abstract protected function requestCompletedWithContent($response);
-
-    // Common method
-    public function onErrorOcurred($errorMEssage) {
-        echo $errorMEssage . "\n";
-    }
-}
 
 class HODClient
 {
     private $apiKey = '';
     private $ver;
-    private $hodAppBase = 'https://api.havenondemand.com/1/api/';
-    private $hodJobResultBase = "https://api.havenondemand.com/1/job/result/";
+    private $hodAppBase = 'https://api.idolondemand.com/1/api/';
+    private $hodJobResultBase = "https://api.idolondemand.com/1/job/result/";
     private $requestTimeout = 600;
     function HODClient($apiKey, $version = "v1") {
         $this->apiKey = $apiKey;
@@ -72,22 +61,20 @@ class HODClient
             $app .= $this->hodAppBase . "async/" . $hodApp . $this->ver;
         }
         $param = $app;
-        $param .= "?apikey=" . $this->apiKey . "&";
+        $param .= "?apikey=" . $this->apiKey;
         //
         foreach($paramArr as $key => $value) {
             if ($key == "file") {
                 error_log("HODClient Error: Invalid parameter\n");
                 throw new Exception("Failed. File upload must be used with PostRequest method", UPLOAD_ERR_NO_FILE);
-            } else if ($key == "arrays") {
-                $noSpace = preg_replace("/ /", "", $value);
-                foreach($noSpace as $kk => $vv) {
-                    $arr = preg_split("/,/", $vv, -1);
-                    for($i = 0; $i < count($arr); $i++) {
-                        $param .= "&". $kk."=".$arr[$i];
-                    }
+            }
+            $type = gettype($value);
+            if ($type == "array") {
+                foreach($value as $kk => $vv) {
+                    $param .= "&" . $key . "=" . rawurlencode($vv);
                 }
             } else {
-                $param .= "&". $key."=".$value;
+                $param .= "&". $key."=" . rawurlencode($value);
             }
         }
         try {
@@ -158,45 +145,66 @@ class HODClient
         $data .= $this->apiKey . $eol;
 
         foreach($paramArr as $key => $value) {
-            if ($key == "file") {
-                $fileName = $value;
-                //$fileSize = filesize($fileName);
-                if(!file_exists($fileName)) {
-                    error_log("HODClient Error: " . $fileName . " does not exist.");
-                    throw new Exception('File not found.', UPLOAD_ERR_NO_FILE);
-                }
-                $mime = mime_content_type($fileName);
+            $type = gettype($value);
+            error_log("Param type: " . $type);
+            if ($type == "array") {
+                foreach($value as $kk => $vv) {
+                    if ($key == "file") {
+                        $fileName = $vv;
+                        //$fileSize = filesize($fileName);
+                        if(!file_exists($fileName)) {
+                            error_log("HODClient Error: " . $fileName . " does not exist.");
+                            throw new Exception('File not found.', UPLOAD_ERR_NO_FILE);
+                        }
+                        $mime = mime_content_type($fileName);
 
-                $data .= $boundary . $eol;
-                $data .= 'Content-Disposition: form-data; name="'.$key.'"; filename="'.$value.'"' . $eol;
-                $data .= 'Content-Type: '. $mime . $eol . $eol;
-
-                //$handle = fopen($fileName, "rb");
-                //$contents = fread($handle, $fileSize);
-                $contents = file_get_contents($fileName);
-                $data .= $contents . $eol;
-                //fclose($handle);
-            } else if ($key == "arrays") {
-                $noSpace = preg_replace("/ /", "", $value);
-                foreach($noSpace as $kk => $vv) {
-                    $arr = preg_split("/,/", $vv, -1);
-                    for($i = 0; $i < count($arr); $i++) {
                         $data .= $boundary . $eol;
-                        $data .= 'Content-Disposition: form-data; name="'.$kk.'"' . $eol . $eol;
-                        $data .= $arr[$i] . $eol;
+                        $data .= 'Content-Disposition: form-data; name="'.$key.'"; filename="'.$value.'"' . $eol;
+                        $data .= 'Content-Type: '. $mime . $eol . $eol;
+
+                        //$handle = fopen($fileName, "rb");
+                        //$contents = fread($handle, $fileSize);
+                        $contents = file_get_contents($fileName);
+                        $data .= $contents . $eol;
+                        //fclose($handle);
+                    } else {
+                        $data .= $boundary . $eol;
+                        $data .= 'Content-Disposition: form-data; name="'.$key.'"' . $eol . $eol;
+                        $data .= $vv . $eol;
                     }
                 }
             } else {
-                $data .= $boundary . $eol;
-                $data .= 'Content-Disposition: form-data; name="'.$key.'"' . $eol . $eol;
-                $data .= $value . $eol;
+                if ($key == "file") {
+                    $fileName = $value;
+                    //$fileSize = filesize($fileName);
+                    if(!file_exists($fileName)) {
+                        error_log("HODClient Error: " . $fileName . " does not exist.");
+                        throw new Exception('File not found.', UPLOAD_ERR_NO_FILE);
+                    }
+                    $mime = mime_content_type($fileName);
+
+                    $data .= $boundary . $eol;
+                    $data .= 'Content-Disposition: form-data; name="'.$key.'"; filename="'.$value.'"' . $eol;
+                    $data .= 'Content-Type: '. $mime . $eol . $eol;
+
+                    //$handle = fopen($fileName, "rb");
+                    //$contents = fread($handle, $fileSize);
+                    $contents = file_get_contents($fileName);
+                    $data .= $contents . $eol;
+                    //fclose($handle);
+                } else {
+                    $data .= $boundary . $eol;
+                    $data .= 'Content-Disposition: form-data; name="'.$key.'"' . $eol . $eol;
+                    $data .= $value . $eol;
+                }
             }
         }
         $data .= $boundary . $eol;
         return $data;
     }
 }
-interface HODApps {
+interface HODApps
+{
     const RECOGNIZE_SPEECH = "recognizespeech";
 
     const CANCEL_CONNECTOR_SCHEDULE = "cancelconnectorschedule";

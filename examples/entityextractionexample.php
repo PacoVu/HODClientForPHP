@@ -3,9 +3,13 @@ include "hodclient.php";
 
 function  getPeopleAndPlaces() {
     $hodClient = new HODClient("YOUR_API_KEY");
+    $sources = array();
+    array_push($sources, "http://www.cnn.com");
+    array_push($sources, "http://www.bbc.com");
+
     $paramArr = array(
-        'url' => "http://www.cnn.com",
-        'arrays' => array("entity_type" => "people_eng,places_eng")
+        'url' => $sources,
+        'entity_type' => ["people_eng","places_eng"]
     );
     try {
         $hodClient->PostRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC, 'requestCompletedWithContent');

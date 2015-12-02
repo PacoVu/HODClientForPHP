@@ -1,8 +1,10 @@
-# HODClient Library for PHP. V1.0
+# HODClient Library for PHP. V2.0
 
 ----
 ## Overview
 HODClient for PHP is a utility class, which helps you easily integrate your .php project with HP Haven OnDemand Services.
+
+HODClient V2.0 supports bulk input (source inputs can be an array) where an HOD API is capable of doing so.
 
 HODClient class exposes source code so you can modify it as you wish.
 
@@ -42,14 +44,17 @@ HODClient class exposes source code so you can modify it as you wish.
 
 >Note: 
 
->In the case of a parameter type is an array<>, the key must be defined as "arrays" and the value must be an array with the key is the parameter name and the values separated by commas ",". 
+>In the case of a parameter type is an array<>, the value must be defined as an array() or [].
 >E.g.:
-## 
-    $paramArr = array(
-        'url' => "http://www.cnn.com",
-        'arrays' => array("entity_type" => "people_eng,places_eng,companies_eng")
-    );
-
+``` 
+$sources = array();
+array_push($sources, "http://www.cnn.com");
+array_push($sources, "http://www.bbc.com");
+$paramArr = array(
+    'url' => $sources,
+    'entity_type' => ["people_eng","places_eng","companies_eng"]
+);
+```
 
 * $hodApp: a string to identify a Haven OnDemand API. E.g. "extractentities". Current supported APIs are listed in the HODApps interface.
 * $mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]: specifies API call as Asynchronous or Synchronous.
@@ -64,10 +69,10 @@ HODClient class exposes source code so you can modify it as you wish.
 
 *Example code:*
 ## 
-    // Call the Entity Extraction API synchronously to find people and places from CNN website.
+    // Call the Entity Extraction API synchronously to find people, places and companies from CNN website.
     $paramArr = array(
         'url' => "http://www.cnn.com",
-        'arrays' => array("entity_type" => "people_eng,places_eng,companies_eng")
+        'entity_type' => ["people_eng","places_eng","companies_eng"]
     );
     try {
         $hodClient->GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC, 'requestCompleted');
@@ -92,13 +97,17 @@ HODClient class exposes source code so you can modify it as you wish.
 
 >Note: 
 
->In the case of a parameter type is an array<>, the key must be defined as "arrays" and the value must be an array with the key is the parameter name and the values separated by commas ",". 
+>In the case of a parameter type is an array<>, the value must be defined as an array() or [].
 >E.g.:
-## 
-    $paramArr = array(
-        'url' => "http://www.cnn.com",
-        'arrays' => array("entity_type" => "people_eng,places_eng,companies_eng")
-    );
+``` 
+$sources = array();
+array_push($sources, "http://www.cnn.com");
+array_push($sources, "http://www.bbc.com");
+$paramArr = array(
+    'url' => $sources,
+    'entity_type' => ["people_eng","places_eng","companies_eng"]
+);
+```
 
 * $hodApp: a string to identify an IDOL OnDemand API. E.g. "ocrdocument". Current supported apps are listed in the IODApps class.
 * $mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]: specifies API call as Asynchronous or Synchronous.
@@ -195,7 +204,7 @@ When you call the GetRequest() or PostRequest() with the SYNC mode or call the G
         $hodClient = new HODClient("YOUR-API-KEY");
         $paramArr = array(
             'url' => "http://www.cnn.com",
-            'arrays' => array("entity_type" => "people_eng,places_eng")
+            'entity_type' => ["people_eng","places_eng"]
         );
         try {
             $hodClient->GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC, 'requestCompletedWithContent');
