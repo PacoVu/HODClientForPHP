@@ -45,7 +45,8 @@ HODClient class exposes source code so you can modify it as you wish.
 >Note: 
 
 >In the case of a parameter type is an array<>, the value must be defined as an array() or [].
->E.g.:
+
+>For Example:
 ``` 
 $sources = array();
 array_push($sources, "http://www.cnn.com");
@@ -98,7 +99,8 @@ $paramArr = array(
 >Note: 
 
 >In the case of a parameter type is an array<>, the value must be defined as an array() or [].
->E.g.:
+
+>For Example:
 ``` 
 $sources = array();
 array_push($sources, "http://www.cnn.com");
