@@ -260,6 +260,7 @@ interface HODApps
     const QUERY_TEXT_INDEX = "querytextindex";
     const RETRIEVE_INDEX_FIELDS = "retrieveindexfields";
 
+    const AUTO_COMPLETE = "autocomplete";
     const CLASSIFY_DOCUMENT = "classifydocument";
     const EXTRACT_CONCEPTS = "extractconcepts";
     const CATEGORIZE_DOCUMENT = "categorizedocument";
