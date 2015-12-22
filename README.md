@@ -59,14 +59,10 @@ $paramArr = array(
 
 * $hodApp: a string to identify a Haven OnDemand API. E.g. "extractentities". Current supported APIs are listed in the HODApps interface.
 * $mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]: specifies API call as Asynchronous or Synchronous.
-* $callback: the name of a callback function, which the HODClient will call back and pass the response from server.
+* $callback: the name of a callback function, which the HODClient will call back and pass the response from server. If the $callback is omitted, or is an empty string "", this function will return a response.
 
 *Response:* 
 * Response from the server will be returned via the provided $callback function
-
-*Exception:*
-
-* This function will throw an error if the operation failed.
 
 *Example code:*
 ## 
@@ -75,11 +71,7 @@ $paramArr = array(
         'url' => "http://www.cnn.com",
         'entity_type' => ["people_eng","places_eng","companies_eng"]
     );
-    try {
-        $hodClient->GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC, 'requestCompleted');
-    } catch (Exception $ex) {
-        echo $ex->getMessage();
-    }
+    $hodClient->GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC, 'requestCompleted');
     // callback function
     function requestCompleted($response) {
         echo $response;
@@ -113,14 +105,10 @@ $paramArr = array(
 
 * $hodApp: a string to identify an IDOL OnDemand API. E.g. "ocrdocument". Current supported apps are listed in the IODApps class.
 * $mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]: specifies API call as Asynchronous or Synchronous.
-* $callback: the name of a callback function, which the HODClient will call back and pass the response from server.
+* $callback: the name of a callback function, which the HODClient will call back and pass the response from server. If the $callback is omitted, or is an empty string "", this function will return a response.
 
 *Response:* 
 * Response from the server will be returned via the provided $callback function
-
-*Exception:*
-
-* this function will throw an error if an operation failed.
 
 *Example code:*
 ## 
@@ -129,11 +117,9 @@ $paramArr = array(
         'file' => "full/path/filename.jpg",
         'mode' => "document_photo")
     );
-    try {
-        $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC, 'requestCompleted');
-    } catch (Exception $ex) {
-        echo $ex->getMessage();
-    }
+    
+    $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC, 'requestCompleted');
+    
     // callback function
     function requestCompleted($response) {
         echo $response;
@@ -149,48 +135,67 @@ $paramArr = array(
 
 *Parameter:*
 * $jobID: the job ID returned from an Haven OnDemand API upon an asynchronous call.
+* $callback: the name of a callback function, which the HODClient will call back and pass the response from server. If the $callback is omitted, or is an empty string "", this function will return a response.
 
 *Response:* 
 * Response from the server will be returned via the provided callback function
-
-*Exception:*
-
-* this function will throw an error if the operation failed.
 
 *Example code:*
 Parse a JSON string contained a jobID and call the function to get content from Haven OnDemand server.
 
 ## 
 
-    func requestCompleted($response) {
-        $jobID = json_decode($response);
-        try {
-            $hodClient->GetJobResult($jobID->jobID, 'requestCompletedWithContent');  
-        } catch (Exception $ex) {
-            echo $ex->getMessage();
-        }
+    func asyncRequestCompleted($jobID) {
+        $hodClient->GetJobResult($jobID, 'requestCompletedWithContent');     
     }
-
     function requestCompletedWithContent($response) {
-        $resp = json_decode($response);
-        // parse $resp object
+        // parse $response object
         ...
     }
 
 ----
+**Function GetJobStatus**
+
+    GetJobStatus($jobID, $callback)
+
+*Description:*
+* Sends a request to Haven OnDemand to retrieve the status of a job identified by a job ID. If the job is completed, the response will be the result of that job. Otherwise, the response will be null and the current status of the job will be held in the error object.
+
+*Parameter:*
+* $jobID: the job ID returned from an Haven OnDemand API upon an asynchronous call.
+* $callback: the name of a callback function, which the HODClient will call back and pass the response from server. If the $callback is omitted, or is an empty string "", this function will return a response.
+
+*Response:* 
+* Response from the server will be returned via the provided callback function
+*Example code:*
+Parse a JSON string contained a jobID and call the function to get content from Haven OnDemand server.
+
+## 
+
+    func asyncRequestCompleted($jobID) {
+        $hodClient->GetJobStatus($jobID, 'requestCompletedWithContent');  
+    }
+
+    function requestCompletedWithContent($response) {
+        
+        // parse $response object
+        ...
+    }
+----
+
 ## Define and implement callback functions
 
 # 
 When you call the GetRequest() or PostRequest() with the ASYNC mode, the response in a callback function will be a JSON string containing a jobID.
 
-    func requestCompletedWithJobId(response:String)
+    func requestCompletedWithJobId($jobID)
     { 
-        // parse the response to get the jobID
+        // use the jobID with GetJobStatus() or GetJobResult()
     }
 # 
 When you call the GetRequest() or PostRequest() with the SYNC mode or call the GetJobResult(), the response in a callback function will be a JSON string containing the actual result of the service.
 
-    func requestCompletedWithContent(response:String)
+    func requestCompletedWithContent($response)
     { 
         // parse the response to get content values
     }
@@ -208,11 +213,8 @@ When you call the GetRequest() or PostRequest() with the SYNC mode or call the G
             'url' => "http://www.cnn.com",
             'entity_type' => ["people_eng","places_eng"]
         );
-        try {
-            $hodClient->GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC, 'requestCompletedWithContent');
-        } catch (Exception $ex) {
-            error_log("Error: " . $ex->getMessage());
-        }
+        $hodClient->GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC, 'requestCompletedWithContent');
+        
     }
 
     // implement callback function
@@ -246,45 +248,54 @@ When you call the GetRequest() or PostRequest() with the SYNC mode or call the G
 
     <?php
     include "hodclient.php";
-    $hodClient = new HODClient("YOUR-API-KEY");
-    
-    function  scanTextFromImage() {    
-        $paramArr = array(
-            'url' => "https://www.idolondemand.com/sample-content/images/speccoll.jpg",
-            'mode' => "document_photo"
-        );
-        try {
-            $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC, 'requestCompletedWithJobId');
-        } catch (Exception $ex) {
-            error_log("Error: " . $ex->getMessage());
-        }
-    }
     
     // implement callback function
-    function requestCompletedWithJobId($response) {
+    function requestCompletedWithJobId($jobID) {
         global $hodClient;
-        $jobID = json_decode($response);
-        try {
-            $hodClient->GetJobResult($jobID->jobID, 'requestCompletedWithContent');  
-        } catch (Exception $ex) {
-            error_log("Error: " . $ex->getMessage());
+        if ($jobID == null)
+        {
+            $errors = $hodClient->getLastError();
+            $err = $errors[0];
+            echo ("Error code: " . $err->error."</br>Error reason: " . $err->reason . "</br>Error detail: " .  $err->detail);
+        } else {
+            $hodClient->GetJobResult($jobID, 'requestCompletedWithContent');
         }
     }
-
     // implement callback function
     function requestCompletedWithContent($response) {
-        $jsonStr = stripslashes($response);
-        $respObj = json_decode($jsonStr);
-       	$result = "";
-        $textBlocks = $respObj->actions[0]->result->text_block;
-        for ($i = 0; $i < count($textBlocks); $i++) {
-            $block = $textBlocks[$i];
-            $result .= $block->text . "</br>";
-            $result .= "#### ####" . "</br>";
+        if ($response == null)
+        {
+            $errors = $hodClient->getLastError();
+            $err = $errors[0];
+            if ($err->error == ErrorCode::QUEUED) {
+                sleep(2);
+                $hodClient->GetJobStatus($err->jobID, 'requestCompletedWithContent');
+            } else if ($err->error == ErrorCode::IN_PROGRESS) {
+                sleep(5);
+                $hodClient->GetJobStatus($err->jobID, 'requestCompletedWithContent');
+            } else {
+                echo ("Error code: " . $err->error."</br>Error reason: " . $err->reason . "</br>Error detail: " .  $err->detail . "JobID: " . $err->jobID);
+            }
         }
-        echo "SCANNED TEXT: " . $result;
+        else {
+            $result = "";
+            $textBlocks = $response->text_block;
+            for ($i = 0; $i < count($textBlocks); $i++) {
+                $block = $textBlocks[$i];
+                $result .= "<html><body><p>";
+                $result .= preg_replace("/\n+/", "</br>", $block->text);
+                $result .= "</p></body></html>";
+            }
+            echo "RECOGNIZED TEXT: " . $result;
+        }
     }
-    scanTextFromImage();
+    $hodClient = new HODClient("YOUR-API-KEY");
+    $paramArr = array(
+        'url' => "https://www.idolondemand.com/sample-content/images/speccoll.jpg",
+        'mode' => "document_photo"
+    );
+    $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC, 'requestCompletedWithJobId');
+    
     ?>
 
 ----

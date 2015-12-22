@@ -6,25 +6,61 @@
  * Date: 10/5/2015
  * Time: 3:53 PM
  */
+
 interface REQ_MODE
 {
     const ASYNC = "async";
     const SYNC = "sync";
 }
 
+class HODErrorObj
+{
+    public $error = 0;
+    public $reason = "";
+    public $detail = "";
+    public $jobID = "";
+
+    function HODErrorObj($code, $reason, $detail="", $jobID="") {
+        $this->error = $code;
+        $this->reason = $reason;
+        $this->detail = $detail;
+        $this->jobID = $jobID;
+    }
+}
+interface ErrorCode
+{
+    const TIMEOUT = 1600;
+    const IN_PROGRESS = 1610;
+    const QUEUED = 1620;
+    const HTTP_ERROR = 1630;
+    const CONNECTION_ERROR = 1640;
+    const IO_ERROR = 1650;
+    const INVALID_PARAM = 1660;
+    const INVALID_HOD_RESPONSE = 1680;
+}
 class HODClient
 {
+    const LOG_ERROR = false;
     private $apiKey = '';
     private $ver;
     private $hodAppBase = 'https://api.idolondemand.com/1/api/';
     private $hodJobResultBase = "https://api.idolondemand.com/1/job/result/";
+    private $hodJobStatusBase = "https://api.idolondemand.com/1/job/status/";
     private $requestTimeout = 600;
+    private $errorList = array();
+
+
     function HODClient($apiKey, $version = "v1") {
         $this->apiKey = $apiKey;
         $this->ver = "/".$version;
     }
 
-    public function GetJobResult($jobID, $callback) {
+    public function getLastError() {
+        return $this->errorList;
+    }
+
+    public function GetJobResult($jobID, $callback="") {
+        $this->errorList = array();
         $param = $this->hodJobResultBase;
         $param .= $jobID;
         $param .= "?apikey=" . $this->apiKey;
@@ -41,19 +77,83 @@ class HODClient
             $curlErrno = curl_errno($ch);
             if ($curlErrno) {
                 $curlError = curl_error($ch);
-                error_log("HODClient Error: " . $curlError);
-                throw new Exception($curlError, $curlErrno);
+                if (self::LOG_ERROR)
+                    error_log("HODClient Error: " . $curlError);
+                $error = new HODErrorObj($curlErrno, $curlError);
+                array_push($this->errorList, $error);
+                if ($callback == "")
+                    return null;
+                else
+                    $callback(null);
+            } else {
+                curl_close($ch);
+                $result = $this->_parseHODResponse($strResponse);
+                if ($callback == "") {
+                    return $result;
+                } else
+                    $callback($result);
             }
-            curl_close($ch);
-            $callback($strResponse);
         } catch (Exception $e) {
-            error_log("HODClient Exception: " . $e->getMessage());
-            throw new Exception($e);
+            if (self::LOG_ERROR)
+                error_log("HODClient Exception: " . $e->getMessage());
+            $error = new HODErrorObj($e->getCode(), $e->getMessage());
+            array_push($this->errorList, $error);
+            if ($callback == "")
+                return null;
+            else
+                $callback(null);
+        }
+    }
+    public function GetJobStatus($jobID, $callback="") {
+        $this->errorList = array();
+        $param = $this->hodJobStatusBase;
+        $param .= $jobID;
+        $param .= "?apikey=" . $this->apiKey;
+        try {
+            $ch = curl_init($param);
+            curl_setopt($ch, CURLOPT_HTTPGET, 1);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_TIMEOUT, $this->requestTimeout);
+
+            //execute post
+            $strResponse = curl_exec($ch);
+            //Get the Error Code returned by Curl.
+            $curlErrno = curl_errno($ch);
+            if ($curlErrno) {
+                $curlError = curl_error($ch);
+                if (self::LOG_ERROR)
+                    error_log("HODClient Error: " . $curlError);
+                $error = new HODErrorObj($curlErrno, $curlError);
+                array_push($this->errorList, $error);
+                if ($callback == "")
+                    return null;
+                else
+                    $callback(null);
+            }
+            else {
+                curl_close($ch);
+                $result = $this->_parseHODResponse($strResponse);
+                if ($callback == "") {
+                    return $result;
+                } else
+                    $callback($result);
+            }
+        } catch (Exception $e) {
+            if (self::LOG_ERROR)
+                error_log("HODClient Exception: " . $e->getMessage());
+            $error = new HODErrorObj($e->getCode(), $e->getMessage());
+            array_push($this->errorList, $error);
+            if ($callback == "")
+                return null;
+            else
+                $callback(null);
         }
     }
 
-    public function GetRequest($paramArr, $hodApp, $mode, $callback)
+    public function GetRequest($paramArr, $hodApp, $mode=REQ_MODE::ASYNC, $callback="")
     {
+        $this->errorList = array();
         $app = "";
         if ($mode == "sync") {
             $app .= $this->hodAppBase . "sync/" . $hodApp . $this->ver;
@@ -65,8 +165,16 @@ class HODClient
         //
         foreach($paramArr as $key => $value) {
             if ($key == "file") {
-                error_log("HODClient Error: Invalid parameter\n");
-                throw new Exception("Failed. File upload must be used with PostRequest method", UPLOAD_ERR_NO_FILE);
+                if (self::LOG_ERROR)
+                    error_log("HODClient Error: File upload must be used with PostRequest method.");
+                $error = new HODErrorObj(ErrorCode::INVALID_PARAM, "File upload must be used with PostRequest method.");
+                array_push($this->errorList, $error);
+                if ($callback == "")
+                    return null;
+                else {
+                    $callback(null);
+                    return;
+                }
             }
             $type = gettype($value);
             if ($type == "array") {
@@ -90,19 +198,41 @@ class HODClient
             $curlErrno = curl_errno($ch);
             if ($curlErrno) {
                 $curlError = curl_error($ch);
-                error_log("HODClient Error: " . $curlError);
-                throw new Exception($curlError, $curlErrno);
+                if (self::LOG_ERROR)
+                    error_log("HODClient Error: " . $curlError);
+                $error = new HODErrorObj($curlErrno, $curlError);
+                array_push($this->errorList, $error);
+                if ($callback == "")
+                    return null;
+                else
+                    $callback(null);
+            } else {
+                curl_close($ch);
+                if ($mode == "async")
+                    $result = $this->_parseJobID($strResponse);
+                else
+                    $result = $this->_parseHODResponse($strResponse);
+
+                if ($callback == "")
+                    return $result;
+                else
+                    $callback($result);
             }
-            curl_close($ch);
-            $callback($strResponse);
         } catch (Exception $e) {
-            error_log("HODClient Exception: " . $e->getMessage());
-            throw new Exception($e);
+            if (self::LOG_ERROR)
+                error_log("HODClient Exception: " . $e->getMessage());
+            $error = new HODErrorObj($e->getCode(), $e->getMessage());
+            array_push($this->errorList, $error);
+            if ($callback == "")
+                return null;
+            else
+                $callback(null);
         }
     }
 
-    public function PostRequest($paramArr, $hodApp, $mode, $callback)
+    public function PostRequest($paramArr, $hodApp, $mode=REQ_MODE::ASYNC, $callback="")
     {
+        $this->errorList = array();
         $app = "";
         if ($mode == "sync") {
             $app .= $this->hodAppBase . "sync/" . $hodApp . $this->ver;
@@ -111,6 +241,15 @@ class HODClient
         }
         $mime_boundary = md5(time());
         $param = $this->packData($paramArr, $mime_boundary);
+        if ($param == null)
+        {
+            if ($callback == "")
+                return null;
+            else {
+                $callback(null);
+                return;
+            }
+        }
         $header = array('Content-Type: multipart/form-data; boundary=' . $mime_boundary);
         try {
             $ch = curl_init($app);
@@ -127,14 +266,36 @@ class HODClient
             $curlErrno = curl_errno($ch);
             if ($curlErrno) {
                 $curlError = curl_error($ch);
-                error_log("HODClient Error: " . $curlError);
-                throw new Exception($curlError, $curlErrno);
+                if (self::LOG_ERROR)
+                    error_log("HODClient Error: " . $curlError);
+                $error = new HODErrorObj($curlErrno, $curlError);
+                array_push($this->errorList, $error);
+                if ($callback == "")
+                    return null;
+                else
+                    $callback(null);
             }
-            curl_close($ch);
-            $callback($strResponse);
+            else {
+                curl_close($ch);
+                if ($mode == "async")
+                    $result = $this->_parseJobID($strResponse);
+                else
+                    $result = $this->_parseHODResponse($strResponse);
+
+                if ($callback == "")
+                    return $result;
+                else
+                    $callback($result);
+            }
         } catch (Exception $e) {
-            error_log("HODClient Exception: " . $e->getMessage());
-            throw new Exception($e);
+            if (self::LOG_ERROR)
+                error_log("HODClient Exception: " . $e->getMessage());
+            $error = new HODErrorObj($e->getCode(), $e->getMessage());
+            array_push($this->errorList, $error);
+            if ($callback == "")
+                return null;
+            else
+                $callback(null);
         }
     }
     private function packData($paramArr, $mime_boundary) {
@@ -146,15 +307,17 @@ class HODClient
 
         foreach($paramArr as $key => $value) {
             $type = gettype($value);
-            error_log("Param type: " . $type);
             if ($type == "array") {
                 foreach($value as $kk => $vv) {
                     if ($key == "file") {
                         $fileName = $vv;
                         //$fileSize = filesize($fileName);
                         if(!file_exists($fileName)) {
-                            error_log("HODClient Error: " . $fileName . " does not exist.");
-                            throw new Exception('File not found.', UPLOAD_ERR_NO_FILE);
+                            if (self::LOG_ERROR)
+                                error_log("HODClient Error: " . $fileName . " does not exist.");
+                            $err = new HODErrorObj(UPLOAD_ERR_NO_FILE, "File not found");
+                            array_push($this->errorList, $err);
+                            return null;
                         }
                         $mime = mime_content_type($fileName);
 
@@ -178,8 +341,11 @@ class HODClient
                     $fileName = $value;
                     //$fileSize = filesize($fileName);
                     if(!file_exists($fileName)) {
-                        error_log("HODClient Error: " . $fileName . " does not exist.");
-                        throw new Exception('File not found.', UPLOAD_ERR_NO_FILE);
+                        if (self::LOG_ERROR)
+                            error_log("HODClient Error: " . $fileName . " does not exist.");
+                        $err = new HODErrorObj(UPLOAD_ERR_NO_FILE, "File not found");
+                        array_push($this->errorList, $err);
+                        return null;
                     }
                     $mime = mime_content_type($fileName);
 
@@ -201,6 +367,58 @@ class HODClient
         }
         $data .= $boundary . $eol;
         return $data;
+    }
+    private function _parseJobID($jsonStr)
+    {
+        $this->errorList = array();
+        $respObj = json_decode($jsonStr);
+        if (isset($respObj->error)) {
+            $err = new HODErrorObj($respObj->error, $respObj->reason);
+            array_push($this->errorList, $err);
+            return null;
+        } else {
+            return $respObj->jobID;
+        }
+    }
+    private function _parseHODResponse($jsonStr)
+    {
+        $this->errorList = array();
+        $respObj = json_decode($jsonStr);
+        if (isset($respObj->actions)) {
+            $action = $respObj->actions[0];
+            if ($action->status == "failed") {
+                //parse error
+                $errors = $action->errors;
+                foreach ($errors as $ke => $ve) {
+                    $err = new HODErrorObj($ve->error, $ve->reason, $ve->detail);
+                    array_push($this->errorList, $err);
+                }
+                return null;
+            } else if ($action->status == "queued") {
+                $err = new HODErrorObj(ErrorCode::QUEUED, "Task is queued", "", $respObj->jobID);
+                array_push($this->errorList, $err);
+                return null;
+            } else if ($action->status == "in progress") {
+                $err = new HODErrorObj(ErrorCode::IN_PROGRESS, "Task is in progress", "", $respObj->jobID);
+                array_push($this->errorList, $err);
+                return null;
+            } else if ($action->status == "finished") {
+                return $action->result;
+            } else {
+                $err = new HODErrorObj(ErrorCode::INVALID_HOD_RESPONSE, "unknown error");
+                array_push($this->errorList, $err);
+                return null;
+            }
+        } else {
+            if (isset($respObj->error)) {
+                $err = new HODErrorObj($respObj->error, $respObj->reason);
+                array_push($this->errorList, $err);
+                return null;
+            } else {
+                return $respObj;
+            }
+        }
+        // { "error": 7000, "reason": "Request took too long" }
     }
 }
 interface HODApps
