@@ -45,8 +45,7 @@ HODClient class exposes source code so you can modify it as you wish.
 >Note: 
 
 >In the case of a parameter type is an array<>, the value must be defined as an array() or [].
-
->For Example:
+>E.g.:
 ``` 
 $sources = array();
 array_push($sources, "http://www.cnn.com");
@@ -76,7 +75,9 @@ $paramArr = array(
     function requestCompleted($response) {
         echo $response;
     }
-    
+    // Direct response mode
+    $response = GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC);
+    echo $response;
 ----
 **Function PostRequest**
  
@@ -91,8 +92,7 @@ $paramArr = array(
 >Note: 
 
 >In the case of a parameter type is an array<>, the value must be defined as an array() or [].
-
->For Example:
+>E.g.:
 ``` 
 $sources = array();
 array_push($sources, "http://www.cnn.com");
@@ -117,14 +117,17 @@ $paramArr = array(
         'file' => "full/path/filename.jpg",
         'mode' => "document_photo")
     );
-    
-    $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC, 'requestCompleted');
+    // Callback mode
+    $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC, 'requestCompletedWithJobID');
     
     // callback function
-    function requestCompleted($response) {
-        echo $response;
+    function requestCompletedWithJobID($jobID) {
+        // use $jobID with GetJobResult() or GetJobStatus() function;
     }
 
+	// Direct response mode
+    $jobID = $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC);
+    // use $jobID with GetJobResult() or GetJobStatus() function;
 ----
 **Function GetJobResult**
 
