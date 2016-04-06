@@ -1,5 +1,5 @@
 {
-  "name": "havenondemand/havenondemand",
+  "name": "havenondemand",
   "description": "This library allows you to quickly and easily make requests to Haven OnDemand's APIs.",
   "version": "1.0.0",
   "homepage": "https://github.com/HPE-Haven-OnDemand/havenondemand-php",
