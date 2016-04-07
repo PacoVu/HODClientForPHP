@@ -5,5 +5,8 @@
   "homepage": "https://github.com/HPE-Haven-OnDemand/havenondemand-php",
   "license": "MIT",
   "keywords": ["HavenOnDemand", "havenondemand", "machine learning", "haven", "ondemand"],
-  "type": "library"
+  "type": "library",
+  "autoload": {
+    "psr-0": {"havenondemand": "lib/"}
+  }
 }
