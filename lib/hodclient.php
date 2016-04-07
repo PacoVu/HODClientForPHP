@@ -43,9 +43,9 @@ class HODClient
     const LOG_ERROR = false;
     private $apiKey = '';
     private $ver;
-    private $hodAppBase = 'https://api.idolondemand.com/1/api/';
-    private $hodJobResultBase = "https://api.idolondemand.com/1/job/result/";
-    private $hodJobStatusBase = "https://api.idolondemand.com/1/job/status/";
+    private $hodAppBase = 'https://api.havenondemand.com/1/api/';
+    private $hodJobResultBase = "https://api.havenondemand.com/1/job/result/";
+    private $hodJobStatusBase = "https://api.havenondemand.com/1/job/status/";
     private $requestTimeout = 600;
     private $errorList = array();
 
