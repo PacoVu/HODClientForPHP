@@ -1,18 +1,30 @@
-# HODClient Library for PHP. V2.0
+# HODClient Library for PHP
 
 ----
 ## Overview
-HODClient for PHP is a utility class, which helps you easily integrate your .php project with HP Haven OnDemand Services.
+HODClient for PHP is a utility class, which helps you easily integrate your .php project with HPE Haven OnDemand Services.
 
-HODClient V2.0 supports bulk input (source inputs can be an array) where an HOD API is capable of doing so.
+HODClient supports bulk input (source inputs can be an array) where an HOD API is capable of doing so.
 
 HODClient class exposes source code so you can modify it as you wish.
 
 ----
 ## Integrate HODClient into php project
+
+### Download from Packagist and include in app
+```
+composer require havenondemand/havenondemand
+```
+Place the following line in your app to include the library
+```
+include './vendor/havenondemand/havenondemand/lib/hodclient.php';
+```
+
+
+### Download directly from Github
 1. Download the HODClient library for PHP.
 2. Unzip and copy the hodclient.php under the lib folder to your project folder.
-3. Include the hodclient.php file in your php file. 
+3. Include the hodclient.php file in your php file.
 
 ----
 ## API References
@@ -20,7 +32,7 @@ HODClient class exposes source code so you can modify it as you wish.
 
     HODClient($apiKey, $version = "v1")
 
-*Description:* 
+*Description:*
 * Creates and initializes a HODClient object.
 
 *Parameters:*
@@ -36,17 +48,17 @@ HODClient class exposes source code so you can modify it as you wish.
 
     GetRequest($paramArr, $hodApp, $mode, $callback)
 
-*Description:* 
+*Description:*
 * Sends a HTTP GET request to call an Haven OnDemand API.
 
 *Parameters:*
 * $paramArr: an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API.
 
->Note: 
+>Note:
 
 >In the case of a parameter type is an array<>, the value must be defined as an array() or [].
 >E.g.:
-``` 
+```
 $sources = array();
 array_push($sources, "http://www.cnn.com");
 array_push($sources, "http://www.bbc.com");
@@ -60,11 +72,11 @@ $paramArr = array(
 * $mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]: specifies API call as Asynchronous or Synchronous.
 * $callback: the name of a callback function, which the HODClient will call back and pass the response from server. If the $callback is omitted, or is an empty string "", this function will return a response.
 
-*Response:* 
+*Response:*
 * Response from the server will be returned via the provided $callback function
 
 *Example code:*
-## 
+##
     // Call the Entity Extraction API synchronously to find people, places and companies from CNN website.
     $paramArr = array(
         'url' => "http://www.cnn.com",
@@ -80,20 +92,20 @@ $paramArr = array(
     echo $response;
 ----
 **Function PostRequest**
- 
+
     PostRequest($paramArr, $hodApp, $mode, $callback)
 
-*Description:* 
+*Description:*
 * Sends a HTTP POST request to call a Haven OnDemand API.
 
 *Parameters:*
-* $paramArr: an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API. 
+* $paramArr: an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API.
 
->Note: 
+>Note:
 
 >In the case of a parameter type is an array<>, the value must be defined as an array() or [].
 >E.g.:
-``` 
+```
 $sources = array();
 array_push($sources, "http://www.cnn.com");
 array_push($sources, "http://www.bbc.com");
@@ -107,11 +119,11 @@ $paramArr = array(
 * $mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]: specifies API call as Asynchronous or Synchronous.
 * $callback: the name of a callback function, which the HODClient will call back and pass the response from server. If the $callback is omitted, or is an empty string "", this function will return a response.
 
-*Response:* 
+*Response:*
 * Response from the server will be returned via the provided $callback function
 
 *Example code:*
-## 
+##
     // Call the OCR Document API asynchronously to scan text from an image file.
     $paramArr = array(
         'file' => "full/path/filename.jpg",
@@ -119,7 +131,7 @@ $paramArr = array(
     );
     // Callback mode
     $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC, 'requestCompletedWithJobID');
-    
+
     // callback function
     function requestCompletedWithJobID($jobID) {
         // use $jobID with GetJobResult() or GetJobStatus() function;
@@ -140,13 +152,13 @@ $paramArr = array(
 * $jobID: the job ID returned from an Haven OnDemand API upon an asynchronous call.
 * $callback: the name of a callback function, which the HODClient will call back and pass the response from server. If the $callback is omitted, or is an empty string "", this function will return a response.
 
-*Response:* 
+*Response:*
 * Response from the server will be returned via the provided callback function
 
 *Example code:*
 Parse a JSON string contained a jobID and call the function to get content from Haven OnDemand server.
 
-## 
+##
 
     func asyncRequestCompleted($jobID) {
         $hodClient->GetJobResult($jobID, 'requestCompletedWithContent');     
@@ -168,19 +180,19 @@ Parse a JSON string contained a jobID and call the function to get content from 
 * $jobID: the job ID returned from an Haven OnDemand API upon an asynchronous call.
 * $callback: the name of a callback function, which the HODClient will call back and pass the response from server. If the $callback is omitted, or is an empty string "", this function will return a response.
 
-*Response:* 
+*Response:*
 * Response from the server will be returned via the provided callback function
 *Example code:*
 Parse a JSON string contained a jobID and call the function to get content from Haven OnDemand server.
 
-## 
+##
 
     func asyncRequestCompleted($jobID) {
         $hodClient->GetJobStatus($jobID, 'requestCompletedWithContent');  
     }
 
     function requestCompletedWithContent($response) {
-        
+
         // parse $response object
         ...
     }
@@ -188,23 +200,23 @@ Parse a JSON string contained a jobID and call the function to get content from 
 
 ## Define and implement callback functions
 
-# 
+#
 When you call the GetRequest() or PostRequest() with the ASYNC mode, the response in a callback function will be a JSON string containing a jobID.
 
     func requestCompletedWithJobId($jobID)
-    { 
+    {
         // use the jobID with GetJobStatus() or GetJobResult()
     }
-# 
+#
 When you call the GetRequest() or PostRequest() with the SYNC mode or call the GetJobResult(), the response in a callback function will be a JSON string containing the actual result of the service.
 
     func requestCompletedWithContent($response)
-    { 
+    {
         // parse the response to get content values
     }
 
 ----
-## Demo code 1: 
+## Demo code 1:
 
 **Call the Entity Extraction API to extract people and places from cnn.com website with a synchronous GET request**
 
@@ -217,7 +229,7 @@ When you call the GetRequest() or PostRequest() with the SYNC mode or call the G
             'entity_type' => ["people_eng","places_eng"]
         );
         $hodClient->GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC, 'requestCompletedWithContent');
-        
+
     }
 
     // implement callback function
@@ -246,12 +258,12 @@ When you call the GetRequest() or PostRequest() with the SYNC mode or call the G
 ----
 
 ## Demo code 2:
- 
+
 **Call the OCR Document API to scan text from an image with an asynchronous POST request**
 
     <?php
     include "hodclient.php";
-    
+
     // implement callback function
     function requestCompletedWithJobId($jobID) {
         global $hodClient;
@@ -298,7 +310,7 @@ When you call the GetRequest() or PostRequest() with the SYNC mode or call the G
         'mode' => "document_photo"
     );
     $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC, 'requestCompletedWithJobId');
-    
+
     ?>
 
 ----
