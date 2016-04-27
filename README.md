@@ -12,6 +12,7 @@ HODClient class exposes source code so you can modify it as you wish.
 ## Integrate HODClient into php project
 
 ### Download from Packagist and include in app
+Run the following command from your terminal (composer must be installed)
 ```
 composer require havenondemand/havenondemand
 ```
