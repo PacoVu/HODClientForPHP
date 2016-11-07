@@ -63,52 +63,45 @@ SetAPIKey($newApiKey)
 
 ----
 **Function GetRequest**
+#
 Sends a HTTP GET request to call an Haven OnDemand API.
 ```
 GetRequest($paramArr, $hodApp, $mode, $callback)
 ```
 * `$paramArr` is an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API.
 
-*Note:*
-
->If a parameter type is an array<>, the value must be defined as an array() or [].
+*Note:* If a parameter type is an array<>, the value must be defined as an array() or [].
 E.g.:
 ```
-    $sources = array();
+$sources = array();
 
-    array_push($sources, "http://www.cnn.com");
-
-    array_push($sources, "http://www.bbc.com");
-
-    $paramArr = array(
-        'url' => $sources,
-        'entity_type' => ["people_eng","places_eng","companies_eng"]
-    );
+array_push($sources, "http://www.cnn.com");
+array_push($sources, "http://www.bbc.com");
+$paramArr = array(
+    'url' => $sources,
+    'entity_type' => ["people_eng","places_eng","companies_eng"]
+);
 ```
+
 * `$hodApp` is a string to identify a Haven OnDemand API. E.g. "extractentities".
 * `$mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]` specifies API call as Asynchronous or Synchronous.
 * `$callback` the name of a callback function. If the $callback is omitted, or is an empty string "", this function will return a response.
 
 *Example code:*
 ```
-    // Call the Entity Extraction API synchronously to find people, places and companies from CNN website.
-    $paramArr = array(
-        'url' => "http://www.cnn.com",
-        'entity_type' => ["people_eng","places_eng","companies_eng"]
-    );
+// Call the Entity Extraction API synchronously to find people, places and companies from CNN website.
+$paramArr = array(
+    'url' => "http://www.cnn.com",
+    'entity_type' => ["people_eng","places_eng","companies_eng"]
+);
 
-    // Callback mode
-    $hodClient->GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC, 'requestCompleted');
-    function requestCompleted($response) {
-        echo $response;
-    }
-    
-    // Direct response mode
-    $response = GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC);
+$response = GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC);
 
-    echo $response;
+echo $response;
 ```
+----
 **Function PostRequest**
+#
 Sends a HTTP POST request to call a Haven OnDemand API.
 ```
 PostRequest($paramArr, $hodApp, $mode, $callback)
@@ -143,21 +136,13 @@ $paramArr = array(
     'file' => "full/path/filename.jpg",
     'mode' => "document_photo")
 );
-// Callback mode
-$hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC, 'requestCompletedWithJobID');
-
-// callback function
-function requestCompletedWithJobID($response) {
-    // parse $response to get the jobID and use it with the GetJobResult() or GetJobStatus() function;
-}
-
-// Direct response mode
 $response = $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC);
     
 // parse $response to get the jobID and use it with the GetJobResult() or GetJobStatus() function;
 ```
-
+----
 **Function GetJobResult**
+#
 Sends a request to Haven OnDemand to retrieve content identified by a job ID.
 ```
 GetJobResult($jobID, $callback)
