@@ -71,7 +71,8 @@ GetRequest($paramArr, $hodApp, $mode, $callback)
 * `$paramArr` is an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API.
 
 *Note:* If a parameter type is an array<>, the value must be defined as an array() or [].
->E.g.:
+
+E.g.:
 ```
 $sources = array();
 
@@ -107,7 +108,8 @@ PostRequest($paramArr, $hodApp, $mode, $callback)
 * `$paramArr` an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API.
 
 *Note:* If a parameter type is an array<>, the value must be defined as an array() or [].
->E.g.:
+
+E.g.:
 ```
 $sources = array();
 array_push($sources, "http://www.cnn.com");
