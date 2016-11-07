@@ -184,7 +184,7 @@ $paramArr = array(
 // Call the Entity Extraction API synchronously to find people, places and companies from CNN website.
 $paramArr = array(
     'url' => "http://www.cnn.com",
-    'entity_type' => ["people_eng","places_eng","companies_eng"]
+    'entity_type' => '["people_eng","places_eng","companies_eng"]'
 );
 $response = GetRequestCombination($paramArr, "combination_api_name", REQ_MODE::SYNC);
 ```
@@ -215,11 +215,10 @@ $paramArr = array(
 // Call the Entity Extraction API synchronously to find people, places and companies from CNN website.
 $paramArr = array(
     'url' => "http://www.cnn.com",
-    'entity_type' => ["people_eng","places_eng","companies_eng"]
+    'entity_type' => '["people_eng","places_eng","companies_eng"]'
 );
 
 $response = PostRequestCombination($paramArr, "combination_api_name", REQ_MODE::SYNC);
-echo $response;
 ```
 #
 ## Define and implement callback functions
@@ -247,15 +246,6 @@ func requestCompletedWithContent($response)
 <?php
 include "hodclient.php";
 
-function  getPeopleAndPlaces() {
-    $hodClient = new HODClient("YOUR-API-KEY");
-    $paramArr = array(
-        'url' => "http://www.cnn.com",
-        'entity_type' => ["people_eng","places_eng"]
-    );
-    $hodClient->GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC, 'requestCompletedWithContent');
-}
-
 // implement callback function
 function requestCompletedWithContent($response) {
     $jsonStr = stripslashes($response);
@@ -276,8 +266,13 @@ function requestCompletedWithContent($response) {
     echo "PEOPLE: " . $people;
     echo "</br>
     echo "PLACES: " . $places;
-    }
-getPeopleAndPlaces();
+}
+$hodClient = new HODClient("YOUR-API-KEY");
+$paramArr = array(
+    'url' => "http://www.cnn.com",
+    'entity_type' => ["people_eng","places_eng"]
+);
+$hodClient->GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC, 'requestCompletedWithContent');
 ?>
 ```
 
@@ -299,7 +294,7 @@ function requestCompletedWithJobId($response) {
         $hodClient->GetJobStatus($resp->jobID, 'requestCompletedWithContent');
     }
 }
-    
+
 // implement callback function
 function requestCompletedWithContent($response) {
     $resp = new HODResponseParser($response);
@@ -336,7 +331,6 @@ function requestCompletedWithContent($response) {
     echo "RECOGNIZED TEXT: " . $result;
 
 }
-    
 
 $hodClient = new HODClient("YOUR-API-KEY");
 $paramArr = array(
