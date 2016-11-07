@@ -75,7 +75,6 @@ GetRequest($paramArr, $hodApp, $mode, $callback)
 E.g.:
 ```php
 $sources = array();
-
 array_push($sources, "http://www.cnn.com");
 array_push($sources, "http://www.bbc.com");
 $paramArr = array(
@@ -104,7 +103,7 @@ Sends a HTTP POST request to call a Haven OnDemand API.
 ```
 PostRequest($paramArr, $hodApp, $mode, $callback)
 ```
-* `$paramArr` an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API.
+* `$paramArr` is an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API.
 
 *Note:* If a parameter type is an array<>, the value must be defined as an array() or [].
 
@@ -273,7 +272,6 @@ function requestCompletedWithJobId($response) {
         $hodClient->GetJobStatus($resp->jobID, 'requestCompletedWithContent');
     }
 }
-
 // implement callback function
 function requestCompletedWithContent($response) {
     $resp = new HODResponseParser($response);
@@ -292,8 +290,8 @@ function requestCompletedWithContent($response) {
         }
 
     }
- else {
-            
+else {
+
         $result = "";
 
         $textBlocks = $response->text_block;
@@ -302,7 +300,6 @@ function requestCompletedWithContent($response) {
 
             $block = $textBlocks[$i];
             $result .= "<html><body><p>";
-
             $result .= preg_replace("/\n+/", "</br>", $block->text);
             $result .= "</p></body></html>";
         }
