@@ -60,6 +60,7 @@ If you want to change the API_KEY without the need to recreate the instance of t
 SetAPIKey($newApiKey)
 ```
 * `newApiKey` a string to specify a new API_KEY
+
 #
 **Function GetRequest**
 
@@ -93,10 +94,8 @@ $paramArr = array(
     'url' => "http://www.cnn.com",
     'entity_type' => ["people_eng","places_eng","companies_eng"]
 );
-
 $response = GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC);
 
-echo $response;
 ```
 #
 **Function PostRequest**
@@ -123,7 +122,7 @@ $paramArr = array(
 ```
 
 * `$hodApp` is a string to identify an Haven OnDemand API. E.g. "ocrdocument".
-* `$mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]1 specifies API call as Asynchronous or Synchronous.
+* `$mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]` specifies API call as Asynchronous or Synchronous.
 * `$callback` the name of a callback function. If the $callback is omitted, or is an empty string "", this function will return a response.
 
 *Example code:*
@@ -135,7 +134,6 @@ $paramArr = array(
 );
 $response = $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC);
     
-// parse $response to get the jobID and use it with the GetJobResult() or GetJobStatus() function;
 ```
 #
 **Function GetJobResult**
@@ -148,15 +146,6 @@ GetJobResult($jobID, $callback)
 * `$callback` the name of a callback function, which the HODClient will call back and pass the response from server. If the $callback is omitted, or is an empty string "", this function will return a response.
 
 
-*Example code:*
-Parse a JSON string contained a jobID and call the function to get content from Haven OnDemand server.
-```
-func asyncRequestCompleted($response) {
-    global $hodClient;
-    $respObj = json_decode($response);
-    $hodClient->GetJobResult($resppObj->jobID, 'requestCompletedWithContent');     
-}
-```
 #
 
 **Function GetJobStatus**
@@ -168,15 +157,6 @@ GetJobStatus($jobID, $callback)
 * `$callback` the name of a callback function, which the HODClient will call back and pass the response from server. If the $callback is omitted, or is an empty string "", this function will return a response.
 
 
-*Example code:*
-Parse a JSON string contained a jobID and call the function to get content from Haven OnDemand server.
-```
-func asyncRequestCompleted($response) {
-    global $hodClient;
-    $respObj = json_decode($response);
-    $hodClient->GetJobStatus($resppObj->jobID, 'requestCompletedWithContent');  
-    }
-```
 #
 **Function GetRequestCombination**
 
@@ -206,9 +186,7 @@ $paramArr = array(
     'url' => "http://www.cnn.com",
     'entity_type' => ["people_eng","places_eng","companies_eng"]
 );
-
 $response = GetRequestCombination($paramArr, "combination_api_name", REQ_MODE::SYNC);
-echo $response;
 ```
 #
 **Function PostRequestCombination**
