@@ -34,7 +34,7 @@ include './vendor/havenondemand/havenondemand/lib/hodresponseparser.php';
 1. Download the HODClient and HODResponseParser libraries for PHP.
 2. Unzip the file and copy the hodclient.php and hodresponseparser.php under the lib folder to your project folder.
 
-
+### Using the library
 Creates and initializes a HODClient object.
 ```
 HODClient($apiKey, $version = "v1")
