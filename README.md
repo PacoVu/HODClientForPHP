@@ -60,10 +60,9 @@ If you want to change the API_KEY without the need to recreate the instance of t
 SetAPIKey($newApiKey)
 ```
 * `newApiKey` a string to specify a new API_KEY
-
-----
-**Function GetRequest**
 #
+**Function GetRequest**
+
 Sends a HTTP GET request to call an Haven OnDemand API.
 ```
 GetRequest($paramArr, $hodApp, $mode, $callback)
@@ -99,19 +98,17 @@ $response = GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC);
 
 echo $response;
 ```
-----
-**Function PostRequest**
 #
+**Function PostRequest**
+
 Sends a HTTP POST request to call a Haven OnDemand API.
 ```
 PostRequest($paramArr, $hodApp, $mode, $callback)
 ```
 * `$paramArr` an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API.
 
-*Note:*
-
->If a parameter type is an array<>, the value must be defined as an array() or [].
->E.g.:
+*Note:* If a parameter type is an array<>, the value must be defined as an array() or [].
+E.g.:
 ```
 $sources = array();
 
@@ -130,7 +127,7 @@ $paramArr = array(
 * `$callback` the name of a callback function. If the $callback is omitted, or is an empty string "", this function will return a response.
 
 *Example code:*
-```php
+```
 // Call the OCR Document API asynchronously to scan text from an image file.
 $paramArr = array(
     'file' => "full/path/filename.jpg",
@@ -140,9 +137,9 @@ $response = $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::
     
 // parse $response to get the jobID and use it with the GetJobResult() or GetJobStatus() function;
 ```
-----
-**Function GetJobResult**
 #
+**Function GetJobResult**
+
 Sends a request to Haven OnDemand to retrieve content identified by a job ID.
 ```
 GetJobResult($jobID, $callback)
@@ -159,11 +156,8 @@ func asyncRequestCompleted($response) {
     $respObj = json_decode($response);
     $hodClient->GetJobResult($resppObj->jobID, 'requestCompletedWithContent');     
 }
-function requestCompletedWithContent($response) {
-    // parse $response
-    ...
-}
 ```
+#
 
 **Function GetJobStatus**
 Sends a request to Haven OnDemand to retrieve the status of a job identified by a job ID.
@@ -182,27 +176,25 @@ func asyncRequestCompleted($response) {
     $respObj = json_decode($response);
     $hodClient->GetJobStatus($resppObj->jobID, 'requestCompletedWithContent');  
     }
-function requestCompletedWithContent($response) {
-    // parse $response
-    ...
-}
 ```
+#
 **Function GetRequestCombination**
+
 Sends a HTTP GET request to call a combination API.
 ```
 GetRequestCombination($paramArr, $hodApp, $mode, $callback)
 ```
 * `$paramArr` is an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of the calling API.
 
-*Note:* 
->If a parameter type is an array [] or a JSON object {}, the value must be quoted as a string.
->E.g.:
+*Note:* If a parameter type is an array [] or a JSON object {}, the value must be quoted as a string.
+E.g.:
 ``` 
 $paramArr = array(
     'url' => 'http://www.bbc.com',
     'entity_type' => '["people_eng","places_eng","companies_eng"]'
 );
 ```
+
 * `$hodApp` is the name of the combination API you are calling
 * `$mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]` specifies API call as Asynchronous or Synchronous.
 * `$callback` the name of a callback function. If the $callback is omitted, or is an empty string "", this function will return a response.
@@ -218,23 +210,24 @@ $paramArr = array(
 $response = GetRequestCombination($paramArr, "combination_api_name", REQ_MODE::SYNC);
 echo $response;
 ```
-
+#
 **Function PostRequestCombination**
+
 Sends a HTTP POST request to call a combination API.
 ```
 PostRequestCombination($paramArr, $hodApp, $mode, $callback)
 ```
 * `$paramArr` is an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of the calling API.
 
-*Note:* 
->If a parameter type is an array [] or a JSON object {}, the value must be quoted as a string.
->E.g.:
+*Note:* If a parameter type is an array [] or a JSON object {}, the value must be quoted as a string.
+E.g.:
 ``` 
 $paramArr = array(
     'url' => 'http://www.bbc.com',
     'entity_type' => '["people_eng","places_eng","companies_eng"]'
 );
 ```
+
 * `$hodApp` is the name of the combination API you are calling
 * `$mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]` specifies API call as Asynchronous or Synchronous.
 * `$callback` the name of a callback function. If the $callback is omitted, or is an empty string "", this function will return a response.
@@ -250,7 +243,7 @@ $paramArr = array(
 $response = PostRequestCombination($paramArr, "combination_api_name", REQ_MODE::SYNC);
 echo $response;
 ```
-
+#
 ## Define and implement callback functions
 
 When you call the GetRequest() or PostRequest() with the ASYNC mode, the response in a callback function will be a JSON string containing a jobID.
@@ -259,6 +252,7 @@ func requestCompletedWithJobId($response)
 {
     // parse the response to get the jobID
 }
+```
 
 When you call the GetRequest() or PostRequest() with the SYNC mode or call the GetJobResult(), the response in a callback function will be a JSON string containing the actual result of the service.
 ```
@@ -266,7 +260,7 @@ func requestCompletedWithContent($response)
 {
     // parse the response to get content values
 }
-
+```
 
 ## Demo code 1:
 
