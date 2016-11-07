@@ -74,13 +74,13 @@ GetRequest($paramArr, $hodApp, $mode, $callback)
 * Sends a HTTP GET request to call an Haven OnDemand API.
 
 *Parameters:*
-* $paramArr: an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API.
+* `$paramArr` is an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API.
 
->Note:
+*Note:*
 
 >In the case of a parameter type is an array<>, the value must be defined as an array() or [].
->E.g.:
-```
+```php
+E.g.:
 $sources = array();
 
 array_push($sources, "http://www.cnn.com");
