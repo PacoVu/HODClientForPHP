@@ -1,7 +1,8 @@
 <?php
 include "libs/hodclient.php";
+include "libs/hodresponseparser.php";
 
-$hodClient = new HODClient("34a54d30-ddaa-4294-8e45-ebe07eefe55e");
+$hodClient = new HODClient("API_KEY");
 
 $paramArr = array(
     'url' => ["http://www.bbc.com","http://www.cnn.com"],
@@ -9,27 +10,24 @@ $paramArr = array(
     "unique_entities" => "true"
 );
 $response = $hodClient->GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC);
-
-if ($response == null)
-{
-    $errors = $hodClient->getLastError();
-    $err = $errors[0];
-    echo ("Error code: " . $err->error."</br>Error reason: " . $err->reason . "</br>Error detail: " .  $err->detail);
-} else {
+$resp = new HODResponseParser($response);
+if ($resp->error != null){
+    echo ("Error code: ".$resp->error->error."</br>Error reason: ".$resp->error->reason."</br>Error detail: ".$resp->error->detail);
+} elseif ($resp->status == "finished") {
     $people = "";
     $places = "";
     $companies = "";
-    $entities = $response->entities;
+    $entities = $resp->payloadObj->entities;
     for ($i = 0; $i < count($entities); $i++) {
         $entity = $entities[$i];
         if ($entity->type == "people_eng") {
-            $people .= $entity->normalized_text . "; ";
+            $people .= $entity->normalized_text . "</br>";
             // parse any other interested information about this person ...
         } else if ($entity->type == "places_eng") {
-            $places .= $entity->normalized_text . "; ";
+            $places .= $entity->normalized_text . "</br>";
             // parse any other interested information about this place ...
         } else if ($entity->type == "companies_eng") {
-            $companies .= $entity->normalized_text . "; ";
+            $companies .= $entity->normalized_text . "</br>";
             // parse any other interested information about this place ...
         }
     }

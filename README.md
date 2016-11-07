@@ -73,7 +73,7 @@ GetRequest($paramArr, $hodApp, $mode, $callback)
 *Note:* If a parameter type is an array<>, the value must be defined as an array() or [].
 
 E.g.:
-```
+```php
 $sources = array();
 
 array_push($sources, "http://www.cnn.com");
@@ -96,7 +96,6 @@ $paramArr = array(
     'entity_type' => ["people_eng","places_eng","companies_eng"]
 );
 $response = GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC);
-
 ```
 #
 **Function PostRequest**
@@ -132,7 +131,6 @@ $paramArr = array(
     'mode' => "document_photo")
 );
 $response = $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC);
-
 ```
 #
 **Function GetJobResult**
@@ -217,28 +215,9 @@ $paramArr = array(
     'url' => "http://www.cnn.com",
     'entity_type' => '["people_eng","places_eng","companies_eng"]'
 );
-
 $response = PostRequestCombination($paramArr, "combination_api_name", REQ_MODE::SYNC);
 ```
 #
-## Define and implement callback functions
-
-When you call the GetRequest() or PostRequest() with the ASYNC mode, the response in a callback function will be a JSON string containing a jobID.
-```
-func requestCompletedWithJobId($response)
-{
-    // parse the response to get the jobID
-}
-```
-
-When you call the GetRequest() or PostRequest() with the SYNC mode or call the GetJobResult(), the response in a callback function will be a JSON string containing the actual result of the service.
-```
-func requestCompletedWithContent($response)
-{
-    // parse the response to get content values
-}
-```
-
 ## Demo code 1:
 
 **Call the Entity Extraction API to extract people and places from cnn.com website with a synchronous GET request**
