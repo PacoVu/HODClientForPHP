@@ -1,14 +1,22 @@
 # HODClient Library for PHP
 
-----
-## Overview
-HODClient for PHP is a utility class, which helps you easily integrate your .php project with HPE Haven OnDemand Services.
+Official PHP client library to help with calling [Haven OnDemand APIs](http://havenondemand.com).
 
-HODClient supports bulk input (source inputs can be an array) where an HOD API is capable of doing so.
+## What is Haven OnDemand?
+Haven OnDemand is a set of over 70 APIs for handling all sorts of unstructured data. Here are just some of our APIs' capabilities:
+* Speech to text
+* OCR
+* Text extraction
+* Indexing documents
+* Smart search
+* Language identification
+* Concept extraction
+* Sentiment analysis
+* Web crawlers
+* Machine learning
 
-HODClient class exposes source code so you can modify it as you wish.
+For a full list of all the APIs and to try them out, check out https://www.havenondemand.com/developer/apis
 
-----
 ## Integrate HODClient into php project
 
 ### Download from Packagist and include in app
@@ -48,20 +56,20 @@ $hodClient = new HODClient("your-api-key");
 If you want to change the API version without the need to recreate the instance of the HOD client.
 ```
 SetVersion($newversion)
-```php
+```
 * `$newVersion` a string to specify an API version as "v1" or "v2"
 
 If you want to change the API_KEY without the need to recreate the instance of the HOD client.
-```php
+```
 SetAPIKey($newApiKey)
 ```
 * `newApiKey` a string to specify a new API_KEY
 
 ----
 **Function GetRequest**
-
-    GetRequest($paramArr, $hodApp, $mode, $callback)
-
+```
+GetRequest($paramArr, $hodApp, $mode, $callback)
+```
 *Description:*
 * Sends a HTTP GET request to call an Haven OnDemand API.
 
@@ -74,17 +82,20 @@ SetAPIKey($newApiKey)
 >E.g.:
 ```
 $sources = array();
+
 array_push($sources, "http://www.cnn.com");
+
 array_push($sources, "http://www.bbc.com");
+
 $paramArr = array(
     'url' => $sources,
     'entity_type' => ["people_eng","places_eng","companies_eng"]
 );
 ```
 
-* $hodApp: a string to identify a Haven OnDemand API. E.g. "extractentities".
-* $mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]: specifies API call as Asynchronous or Synchronous.
-* $callback: the name of a callback function. If the $callback is omitted, or is an empty string "", this function will return a response.
+* `$hodApp` is a string to identify a Haven OnDemand API. E.g. "extractentities".
+* `$mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]` specifies API call as Asynchronous or Synchronous.
+* `$callback` the name of a callback function. If the $callback is omitted, or is an empty string "", this function will return a response.
 
 *Example code:*
 ```php
@@ -106,14 +117,14 @@ $response = GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC);
 echo $response;
 ```
 **Function PostRequest**
-
-    PostRequest($paramArr, $hodApp, $mode, $callback)
-
+```
+PostRequest($paramArr, $hodApp, $mode, $callback)
+```
 *Description:*
 * Sends a HTTP POST request to call a Haven OnDemand API.
 
 *Parameters:*
-* $paramArr: an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API.
+* `$paramArr` an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API.
 
 >Note:
 
@@ -132,9 +143,9 @@ $paramArr = array(
 );
 ```
 
-* $hodApp: a string to identify an IDOL OnDemand API. E.g. "ocrdocument".
-* $mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]: specifies API call as Asynchronous or Synchronous.
-* $callback: the name of a callback function. If the $callback is omitted, or is an empty string "", this function will return a response.
+* `$hodApp` is a string to identify an IDOL OnDemand API. E.g. "ocrdocument".
+* `$mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]1 specifies API call as Asynchronous or Synchronous.
+* `$callback` the name of a callback function. If the $callback is omitted, or is an empty string "", this function will return a response.
 
 *Example code:*
 ```php
@@ -158,15 +169,15 @@ $response = $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::
 ```
 
 **Function GetJobResult**
-
-    GetJobResult($jobID, $callback)
-
+```
+GetJobResult($jobID, $callback)
+```
 *Description:*
 * Sends a request to Haven OnDemand to retrieve content identified by a job ID.
 
 *Parameter:*
-* $jobID: the job ID returned from an Haven OnDemand API upon an asynchronous call.
-* $callback: the name of a callback function, which the HODClient will call back and pass the response from server. If the $callback is omitted, or is an empty string "", this function will return a response.
+* `$jobID` the job ID returned from an Haven OnDemand API upon an asynchronous call.
+* `$callback` the name of a callback function, which the HODClient will call back and pass the response from server. If the $callback is omitted, or is an empty string "", this function will return a response.
 
 
 *Example code:*
@@ -184,15 +195,15 @@ function requestCompletedWithContent($response) {
 ```
 
 **Function GetJobStatus**
-
-    GetJobStatus($jobID, $callback)
-
+```
+GetJobStatus($jobID, $callback)
+```
 *Description:*
 * Sends a request to Haven OnDemand to retrieve the status of a job identified by a job ID. If the job is completed, the response will be the result of that job. Otherwise, the response will be null and the current status of the job will be held in the error object.
 
 *Parameter:*
-* $jobID: the job ID returned from an Haven OnDemand API upon an asynchronous call.
-* $callback: the name of a callback function, which the HODClient will call back and pass the response from server. If the $callback is omitted, or is an empty string "", this function will return a response.
+* `$jobID` the job ID returned from an Haven OnDemand API upon an asynchronous call.
+* `$callback` the name of a callback function, which the HODClient will call back and pass the response from server. If the $callback is omitted, or is an empty string "", this function will return a response.
 
 
 *Example code:*
@@ -209,14 +220,14 @@ function requestCompletedWithContent($response) {
 }
 ```
 **Function GetRequestCombination**
-
-    GetRequestCombination($paramArr, $hodApp, $mode, $callback)
-
+```
+GetRequestCombination($paramArr, $hodApp, $mode, $callback)
+```
 *Description:* 
 * Sends a HTTP GET request to call an Haven OnDemand API.
 
 *Parameters:*
-* $paramArr: is an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of the calling API.
+* `$paramArr` is an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of the calling API.
 
 >Note: 
 
@@ -229,9 +240,9 @@ $paramArr = array(
 );
 ```
 
-* $hodApp: is the name of the combination API you are calling
-* $mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]: specifies API call as Asynchronous or Synchronous.
-* $callback: the name of a callback function. If the $callback is omitted, or is an empty string "", this function will return a response.
+* `$hodApp` is the name of the combination API you are calling
+* `$mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]` specifies API call as Asynchronous or Synchronous.
+* `$callback` the name of a callback function. If the $callback is omitted, or is an empty string "", this function will return a response.
 
 *Example code:*
 ```php 
@@ -255,18 +266,18 @@ echo $response;
 ## Define and implement callback functions
 
 When you call the GetRequest() or PostRequest() with the ASYNC mode, the response in a callback function will be a JSON string containing a jobID.
+```
+func requestCompletedWithJobId($response)
+{
+    // parse the response to get the jobID
+}
 
-    func requestCompletedWithJobId($response)
-    {
-        // use the jobID with GetJobStatus() or GetJobResult()
-    }
-#
 When you call the GetRequest() or PostRequest() with the SYNC mode or call the GetJobResult(), the response in a callback function will be a JSON string containing the actual result of the service.
-
-    func requestCompletedWithContent($response)
-    {
-        // parse the response to get content values
-    }
+```
+func requestCompletedWithContent($response)
+{
+    // parse the response to get content values
+}
 
 
 ## Demo code 1:
