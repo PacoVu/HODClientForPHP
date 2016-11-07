@@ -71,7 +71,7 @@ GetRequest($paramArr, $hodApp, $mode, $callback)
 * `$paramArr` is an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API.
 
 *Note:* If a parameter type is an array<>, the value must be defined as an array() or [].
-E.g.:
+>E.g.:
 ```
 $sources = array();
 
@@ -107,14 +107,11 @@ PostRequest($paramArr, $hodApp, $mode, $callback)
 * `$paramArr` an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API.
 
 *Note:* If a parameter type is an array<>, the value must be defined as an array() or [].
-E.g.:
+>E.g.:
 ```
 $sources = array();
-
 array_push($sources, "http://www.cnn.com");
-
 array_push($sources, "http://www.bbc.com");
-
 $paramArr = array(
     'url' => $sources,
     'entity_type' => ["people_eng","places_eng","companies_eng"]
@@ -133,7 +130,7 @@ $paramArr = array(
     'mode' => "document_photo")
 );
 $response = $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC);
-    
+
 ```
 #
 **Function GetJobResult**
@@ -149,6 +146,7 @@ GetJobResult($jobID, $callback)
 #
 
 **Function GetJobStatus**
+
 Sends a request to Haven OnDemand to retrieve the status of a job identified by a job ID.
 ```
 GetJobStatus($jobID, $callback)
