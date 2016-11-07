@@ -34,18 +34,14 @@ include './vendor/havenondemand/havenondemand/lib/hodresponseparser.php';
 1. Download the HODClient and HODResponseParser libraries for PHP.
 2. Unzip the file and copy the hodclient.php and hodresponseparser.php under the lib folder to your project folder.
 
-----
-## API References
-**Constructor**
 
-    HODClient($apiKey, $version = "v1")
+Creates and initializes a HODClient object.
+```
+HODClient($apiKey, $version = "v1")
+```
 
-*Description:* 
-* Creates and initializes a HODClient object.
-
-*Parameters:*
-* $apiKey: your developer apikey.
-* $version: Haven OnDemand API version. The default value is "v1".
+* `$apiKey` is your developer apikey.
+* `$version` Haven OnDemand API version. The default value is "v1".
 
 *Example code:*
 ```
@@ -78,9 +74,9 @@ GetRequest($paramArr, $hodApp, $mode, $callback)
 
 *Note:*
 
->In the case of a parameter type is an array<>, the value must be defined as an array() or [].
-```php
+>If a parameter type is an array<>, the value must be defined as an array() or [].
 E.g.:
+```php
 $sources = array();
 
 array_push($sources, "http://www.cnn.com");
@@ -92,7 +88,6 @@ $paramArr = array(
     'entity_type' => ["people_eng","places_eng","companies_eng"]
 );
 ```
-
 * `$hodApp` is a string to identify a Haven OnDemand API. E.g. "extractentities".
 * `$mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]` specifies API call as Asynchronous or Synchronous.
 * `$callback` the name of a callback function. If the $callback is omitted, or is an empty string "", this function will return a response.
@@ -126,9 +121,9 @@ PostRequest($paramArr, $hodApp, $mode, $callback)
 *Parameters:*
 * `$paramArr` an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API.
 
->Note:
+*Note:*
 
->In the case of a parameter type is an array<>, the value must be defined as an array() or [].
+>If a parameter type is an array<>, the value must be defined as an array() or [].
 >E.g.:
 ```php
 $sources = array();
@@ -142,7 +137,6 @@ $paramArr = array(
     'entity_type' => ["people_eng","places_eng","companies_eng"]
 );
 ```
-
 * `$hodApp` is a string to identify an IDOL OnDemand API. E.g. "ocrdocument".
 * `$mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]1 specifies API call as Asynchronous or Synchronous.
 * `$callback` the name of a callback function. If the $callback is omitted, or is an empty string "", this function will return a response.
