@@ -40,5 +40,9 @@ $paramArr = array(
     "entity_type" => ["people_eng", "places_eng", "companies_eng"],
     "unique_entities" => "true"
 );
-$hodClient->GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC, 'requestCompletedWithContent');
+try {
+	$hodClient->GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, false, 'requestCompletedWithContent');
+}catch (Exception $ex){
+	echo $ex.getMessage();
+}
 ?>

@@ -46,7 +46,7 @@ HODClient($apiKey, $version = "v1")
 *Example code:*
 ```
 include "hodclient.php"
-$hodClient = new HODClient("your-api-key");
+$hodClient = new HODClient("API_KEY");
 ```
 
 If you want to change the API version without the need to recreate the instance of the HOD client.
@@ -66,7 +66,7 @@ SetAPIKey($newApiKey)
 
 Sends a HTTP GET request to call an Haven OnDemand API.
 ```
-GetRequest($paramArr, $hodApp, $mode, $callback)
+GetRequest($paramArr, $hodApp, $async, $callback)
 ```
 * `$paramArr` is an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API.
 
@@ -84,7 +84,7 @@ $paramArr = array(
 ```
 
 * `$hodApp` is a string to identify a Haven OnDemand API. E.g. "extractentities".
-* `$mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]` specifies API call as Asynchronous or Synchronous.
+* `$async [true | false]` specifies API call as Asynchronous or Synchronous.
 * `$callback` the name of a callback function. If the $callback is omitted, or is an empty string "", this function will return a response.
 
 *Example code:*
@@ -94,14 +94,14 @@ $paramArr = array(
     'url' => "http://www.cnn.com",
     'entity_type' => ["people_eng","places_eng","companies_eng"]
 );
-$response = GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC);
+$response = GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, false);
 ```
 #
 **Function PostRequest**
 
 Sends a HTTP POST request to call a Haven OnDemand API.
 ```
-PostRequest($paramArr, $hodApp, $mode, $callback)
+PostRequest($paramArr, $hodApp, $async, $callback)
 ```
 * `$paramArr` is an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that Haven OnDemand API.
 
@@ -119,7 +119,7 @@ $paramArr = array(
 ```
 
 * `$hodApp` is a string to identify an Haven OnDemand API. E.g. "ocrdocument".
-* `$mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]` specifies API call as Asynchronous or Synchronous.
+* `$async [true | false]` specifies API call as Asynchronous or Synchronous.
 * `$callback` the name of a callback function. If the $callback is omitted, or is an empty string "", this function will return a response.
 
 *Example code:*
@@ -129,7 +129,7 @@ $paramArr = array(
     'file' => "full/path/filename.jpg",
     'mode' => "document_photo")
 );
-$response = $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC);
+$response = $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, true);
 ```
 #
 **Function GetJobResult**
@@ -159,7 +159,7 @@ GetJobStatus($jobID, $callback)
 
 Sends a HTTP GET request to call a combination API.
 ```
-GetRequestCombination($paramArr, $hodApp, $mode, $callback)
+GetRequestCombination($paramArr, $hodApp, $async, $callback)
 ```
 * `$paramArr` is an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of the calling API.
 
@@ -173,7 +173,7 @@ $paramArr = array(
 ```
 
 * `$hodApp` is the name of the combination API you are calling
-* `$mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]` specifies API call as Asynchronous or Synchronous.
+* `$async [true | false]` specifies API call as Asynchronous or Synchronous.
 * `$callback` the name of a callback function. If the $callback is omitted, or is an empty string "", this function will return a response.
 
 *Example code:*
@@ -183,14 +183,14 @@ $paramArr = array(
     'url' => "http://www.cnn.com",
     'entity_type' => '["people_eng","places_eng","companies_eng"]'
 );
-$response = GetRequestCombination($paramArr, "combination_api_name", REQ_MODE::SYNC);
+$response = GetRequestCombination($paramArr, "combination_api_name", false);
 ```
 #
 **Function PostRequestCombination**
 
 Sends a HTTP POST request to call a combination API.
 ```
-PostRequestCombination($paramArr, $hodApp, $mode, $callback)
+PostRequestCombination($paramArr, $hodApp, $async, $callback)
 ```
 * `$paramArr` is an array() containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of the calling API.
 
@@ -204,7 +204,7 @@ $paramArr = array(
 ```
 
 * `$hodApp` is the name of the combination API you are calling
-* `$mode [REQ_MODE::SYNC | REQ_MODE::ASYNC]` specifies API call as Asynchronous or Synchronous.
+* `$async [true | false]` specifies API call as Asynchronous or Synchronous.
 * `$callback` the name of a callback function. If the $callback is omitted, or is an empty string "", this function will return a response.
 
 *Example code:*
@@ -214,7 +214,7 @@ $paramArr = array(
     'url' => "http://www.cnn.com",
     'entity_type' => '["people_eng","places_eng","companies_eng"]'
 );
-$response = PostRequestCombination($paramArr, "combination_api_name", REQ_MODE::SYNC);
+$response = PostRequestCombination($paramArr, "combination_api_name", false);
 ```
 #
 ## Demo code 1:
@@ -250,7 +250,11 @@ $paramArr = array(
     'url' => "http://www.cnn.com",
     'entity_type' => ["people_eng","places_eng"]
 );
-$hodClient->GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, REQ_MODE::SYNC, 'requestCompletedWithContent');
+try {
+    $hodClient->GetRequest($paramArr, HODApps::ENTITY_EXTRACTION, false, 'requestCompletedWithContent');
+} catch (Exception $ex) {
+    echo $ex->getMessage();
+}
 ?>
 ```
 
@@ -304,7 +308,7 @@ else {
             $result .= "</p></body></html>";
         }
     }
-    echo "RECOGNIZED TEXT: " . $result;
+    echo "RECOGNIZED TEXT: ".$result;
 
 }
 
@@ -313,7 +317,11 @@ $paramArr = array(
     'url' => "https://www.hodondemand.com/sample-content/images/speccoll.jpg",
     'mode' => "document_photo"
 );
-$hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC, 'requestCompletedWithJobId');
+try {
+    $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, true, 'requestCompletedWithJobId');
+} catch (Exception $ex) {
+    echo $ex->getMessage();
+}
 ?>
 ```
 

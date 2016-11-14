@@ -11,7 +11,11 @@ function requestCompletedWithJobId($response) {
     if ($resp->error != null) {
         echo (json_encode($resp->error));
     }else {
-        $hodClient->GetJobStatus($resp->jobID, 'requestCompletedWithContent');
+		try {
+			$hodClient->GetJobStatus($resp->jobID, 'requestCompletedWithContent');
+		}catch (Exception $ex){
+			echo $ex.getMessage();
+		}
     }
 }
 
@@ -25,11 +29,19 @@ function requestCompletedWithContent($response)
         if ($err->error == HODErrorCode::QUEUED) {
             error_log("queued:".$err->jobID);
             sleep(2);
-            $hodClient->GetJobStatus($err->jobID, 'requestCompletedWithContent');
+			try {
+	           $hodClient->GetJobStatus($err->jobID, 'requestCompletedWithContent');
+			}catch (Exception $ex){
+				echo $ex.getMessage();
+			}
         } else if ($err->error == HODErrorCode::IN_PROGRESS) {
             error_log("in progress:".$err->jobID);
             sleep(5);
-            $hodClient->GetJobStatus($err->jobID, 'requestCompletedWithContent');
+            try {
+				$hodClient->GetJobStatus($err->jobID, 'requestCompletedWithContent');
+			}catch (Exception $ex){
+				echo $ex.getMessage();
+			}
         } else {
             $error = "<b>Error:</b></br>";
             $error .= $resp->error->error . "</br>";
@@ -54,5 +66,9 @@ $paramArr = array(
     'file' => "0005r005.gif",
     'mode' => "document_photo"
 );
-$hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC, 'requestCompletedWithJobId');
+try {
+	$hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, true, 'requestCompletedWithJobId');
+}catch (Exception $ex){
+	echo $ex.getMessage();
+}
 ?>

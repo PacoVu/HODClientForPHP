@@ -7,12 +7,6 @@
  * Time: 3:53 PM
  */
 
-interface REQ_MODE
-{
-    const ASYNC = "async";
-    const SYNC = "sync";
-}
-
 class HODClient
 {
     const LOG_ERROR = false;
@@ -65,7 +59,7 @@ class HODClient
         } catch (Exception $e) {
             if (self::LOG_ERROR)
                 error_log("HODClient Exception: " . $e->getMessage());
-            throw new Exception($e);
+            throw $e;
         }
     }
     public function GetJobStatus($jobID, $callback="") {
@@ -94,23 +88,23 @@ class HODClient
         } catch (Exception $e) {
             if (self::LOG_ERROR)
                 error_log("HODClient Exception: " . $e->getMessage());
-             throw new Exception($e);
+             throw $e;
         }
     }
 
-    public function GetRequest($paramArr, $hodApp, $mode=REQ_MODE::ASYNC, $callback="")
+    public function GetRequest($paramArr, $hodApp, $async=true, $callback="")
     {
-       if ($mode == "sync") {
-            $param = sprintf("%ssync/%s%s?apikey=%s",$this->hodAppBase,$hodApp,$this->ver,$this->apiKey);
-        } else {
+       if ($async) {
             $param = sprintf("%sasync/%s%s?apikey=%s",$this->hodAppBase,$hodApp,$this->ver,$this->apiKey);
+        } else {
+            $param = sprintf("%ssync/%s%s?apikey=%s",$this->hodAppBase,$hodApp,$this->ver,$this->apiKey);
         }
         //
         foreach($paramArr as $key => $value) {
             if ($key == "file") {
 				if (self::LOG_ERROR)
 	                error_log("HODClient Error: Invalid parameter\n");
-                throw new Exception("Failed. File upload must be used with PostRequest method", UPLOAD_ERR_NO_FILE);
+                throw new Exception("File upload must be used with PostRequest method", UPLOAD_ERR_NO_FILE);
             }else{
 				$type = gettype($value);
 				if ($type == "array") {
@@ -146,16 +140,16 @@ class HODClient
         } catch (Exception $e) {
             if (self::LOG_ERROR)
                 error_log("HODClient Exception: " . $e->getMessage());
-            throw new Exception($e);
+            throw $e;
         }
     }
 
-    public function PostRequest($paramArr, $hodApp, $mode=REQ_MODE::ASYNC, $callback="")
+    public function PostRequest($paramArr, $hodApp, $async=true, $callback="")
     {
-        if ($mode == "sync") {
-			$endpoint = sprintf("%ssync/%s%s",$this->hodAppBase,$hodApp,$this->ver);
+        if ($async) {
+			$endpoint = sprintf("%sasync/%s%s",$this->hodAppBase,$hodApp,$this->ver);
         } else {
-            $endpoint = sprintf("%sasync/%s%s",$this->hodAppBase,$hodApp,$this->ver);
+            $endpoint = sprintf("%ssync/%s%s",$this->hodAppBase,$hodApp,$this->ver);
         }
         $this->mime_boundary = md5(time());
         $param = $this->packData($paramArr);
@@ -195,7 +189,7 @@ class HODClient
         } catch (Exception $e) {
             if (self::LOG_ERROR)
                 error_log("HODClient Exception: " . $e->getMessage());
-            throw new Exception($e);
+            throw $e;
         }
     }
     private function packData($paramArr) {
@@ -250,20 +244,20 @@ class HODClient
         return $data;
     }
 
-	public function GetRequestCombination($paramArr, $hodApp, $mode, $callback)
+	public function GetRequestCombination($paramArr, $hodApp, $async=true, $callback="")
     {
         $queryStr = $this->hodAppBase;
-        if ($mode == "sync") {
-            $queryStr .= sprintf("%s%s",$this->hodCombineSync,$this->ver);
-        } else {
+        if ($async) {
             $queryStr .= sprintf("%s%s",$this->hodCombineAsync,$this->ver);
+        } else {
+            $queryStr .= sprintf("%s%s",$this->hodCombineSync,$this->ver);
         }
 		$queryStr .= sprintf("?apikey=%s&combination=%s", $this->apiKey, $hodApp);
         foreach($paramArr as $key => $value) {
             if ($key == "file") {
 				if (self::LOG_ERROR)
 	                error_log("HODClient Error: Invalid parameter\n");
-                throw new Exception("Failed. File upload must be used with PostRequestCombination method", UPLOAD_ERR_NO_FILE);
+                throw new Exception("File upload must be used with PostRequestCombination method", UPLOAD_ERR_NO_FILE);
             }else{
 	            if ($this->isJSON($value))
 					$param = '&parameters={"name":"%s","value":%s}';
@@ -296,16 +290,16 @@ class HODClient
         } catch (Exception $e) {
 			if (self::LOG_ERROR)
 	            error_log("HODClient Exception: " . $e->getMessage());
-            throw new Exception($e);
+            throw $e;
         }
     }
-	public function PostRequestCombination($paramArr, $hodApp, $mode, $callback)
+	public function PostRequestCombination($paramArr, $hodApp, $async=true, $callback="")
     {
         $endPoint = $this->hodAppBase;
-        if ($mode == "sync") {
-            $endPoint .= $this->hodCombineSync . $this->ver;
-        } else {
+        if ($async) {
             $endPoint .= $this->hodCombineAsync . $this->ver;
+        } else {
+            $endPoint .= $this->hodCombineSync . $this->ver;
         }
 
         $this->mime_boundary = md5(time());
@@ -337,7 +331,7 @@ class HODClient
         } catch (Exception $e) {
 			if (self::LOG_ERROR)
 	            error_log("HODClient Exception: " . $e->getMessage());
-            throw new Exception($e);
+            throw $e;
         }
     }
 	private function packCombinationData($paramArr, $hodApp) {
@@ -348,7 +342,7 @@ class HODClient
             if ($key == "file") {
 				if (self::LOG_ERROR)
 	                error_log("HODClient Error: file resource is not yet supported\n");
-                throw new Exception("Failed. file resource is not yet supported", UPLOAD_ERR_NO_FILE);
+                throw new Exception("File resource is not yet supported", UPLOAD_ERR_NO_FILE);
             } else {
 				if ($this->isJSON($value))
 					$param = '{"name":"%s","value":%s}';
@@ -437,6 +431,8 @@ interface HODApps
     const PREDICT = "predict";
     const RECOMMEND = "recommend";
     const TRAIN_PREDICTOR = "trainpredictor";
+    const DELETE_PREDICTION_MODEL = "deletepredictionmodel";
+    const GET_PREDICTION_MODEL_DETAILS = "getpredictionmodeldetails";
 
     const CREATE_QUERY_PROFILE = "createqueryprofile";
     const DELETE_QUERY_PROFILE = "deletequeryprofile";

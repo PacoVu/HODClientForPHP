@@ -9,29 +9,33 @@ $paramArr = array(
     'mode' => "document_photo"
 );
 
-$response = $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC);
-$resp = new HODJobIDParser($response);
-if ($resp->error != null) {
-    echo (json_encode($resp->error));
-} else {
-    $response = $hodClient->GetJobResult($resp->jobID);
-    $resp = new HODResponseParser($response);
-    if ($resp->error != null) {
-        $error = "<b>Error:</b></br>";
-        $error .= $resp->error->error . "</br>";
-        $error .= $resp->error->reason . "</br>";
-        $error .= $resp->error->detail . "</br>";
-        echo $error;
-    } elseif ($resp->status == "finished") {
-        $result = "";
-        $textBlocks =  $resp->payloadObj->text_block;
-        for ($i = 0; $i < count($textBlocks); $i++) {
-            $block = $textBlocks[$i];
-            $result .= "<html><body><p>";
-            $result .= preg_replace("/\n+/", "</br>", $block->text);
-            $result .= "</p></body></html>";
-        }
-        echo "RECOGNIZED TEXT: " . $result;
-    }
+try {
+	$response = $hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, true);
+	$resp = new HODJobIDParser($response);
+	if ($resp->error != null) {
+		echo (json_encode($resp->error));
+	} else {
+		$response = $hodClient->GetJobResult($resp->jobID);
+		$resp = new HODResponseParser($response);
+		if ($resp->error != null) {
+			$error = "<b>Error:</b></br>";
+			$error .= $resp->error->error . "</br>";
+			$error .= $resp->error->reason . "</br>";
+			$error .= $resp->error->detail . "</br>";
+			echo $error;
+		} elseif ($resp->status == "finished") {
+			$result = "";
+			$textBlocks =  $resp->payloadObj->text_block;
+			for ($i = 0; $i < count($textBlocks); $i++) {
+				$block = $textBlocks[$i];
+				$result .= "<html><body><p>";
+				$result .= preg_replace("/\n+/", "</br>", $block->text);
+				$result .= "</p></body></html>";
+			}
+			echo "RECOGNIZED TEXT: " . $result;
+		}
+	}
+}catch (Exception $ex){
+	echo $ex.getMessage();
 }
 ?>
