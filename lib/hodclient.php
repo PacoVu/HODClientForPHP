@@ -339,10 +339,33 @@ class HODClient
         $data .= $this->postDataField("combination", $hodApp);
 
         foreach($paramArr as $key => $value) {
-            if ($key == "file") {
-				if (self::LOG_ERROR)
-	                error_log("HODClient Error: file resource is not yet supported\n");
-                throw new Exception("File resource is not yet supported", UPLOAD_ERR_NO_FILE);
+            $type = gettype($value);
+            if ($type == "array") {
+                foreach($value as $kk => $vv) {
+                    if ($key == "file") {
+                        $fileName = $vv;
+                        //$fileSize = filesize($fileName);
+                        if(!file_exists($fileName)) {
+                            if (self::LOG_ERROR)
+                                error_log("HODClient Error: " . $fileName . " does not exist.");
+                            throw new Exception('File not found.', UPLOAD_ERR_NO_FILE);
+                        }
+                        $data .= $this->postDataField('file_parameters', $kk);
+                        $arr = preg_split('/\//', $fileName);
+                        $count = count($arr)-1;
+                        error_log($arr[$count]);
+                        $mime = mime_content_type($arr[$count]);
+                        $data .= $this->postFileField($key, 'file', $mime);
+
+                        //$handle = fopen($fileName, "rb");
+                        //$contents = fread($handle, $fileSize);
+                        $contents = file_get_contents($fileName);
+                        $data .= $contents . "\r\n";
+                        //fclose($handle);
+                    } else {
+                        $data .= $this->postDataField($key, $vv);
+                    }
+                }
             } else {
 				if ($this->isJSON($value))
 					$param = '{"name":"%s","value":%s}';
