@@ -1,19 +1,21 @@
 <?php
 include "libs/hodclient.php";
+include "libs/hodresponseparser.php";
 
-
-$hodClient = new HODClient("34a54d30-ddaa-4294-8e45-ebe07eefe55e");
+$hodClient = new HODClient("API_KEY");
 
 // implement callback function
-function requestCompletedWithJobId($jobID) {
+function requestCompletedWithJobId($response) {
     global $hodClient;
-    if ($jobID == null)
-    {
-        $errors = $hodClient->getLastError();
-        $err = $errors[0];
-        echo ($err->error." / " . $err->reason . " / " . $err->detail);
-    } else {
-        $hodClient->GetJobStatus($jobID, 'requestCompletedWithContent');
+    $resp = new HODJobIDParser($response);
+    if ($resp->error != null) {
+        echo (json_encode($resp->error));
+    }else {
+		try {
+			$hodClient->GetJobStatus($resp->jobID, 'requestCompletedWithContent');
+		}catch (Exception $ex){
+			echo $ex.getMessage();
+		}
     }
 }
 
@@ -21,23 +23,35 @@ function requestCompletedWithJobId($jobID) {
 function requestCompletedWithContent($response)
 {
     global $hodClient;
-    if ($response == null)
-    {
-        $errors = $hodClient->getLastError();
-        $err = $errors[0];
-        if ($err->error == ErrorCode::QUEUED) {
+    $resp = new HODResponseParser($response);
+    if ($resp->error != null){
+        $err = $resp->error;
+        if ($err->error == HODErrorCode::QUEUED) {
+            error_log("queued:".$err->jobID);
             sleep(2);
-            $hodClient->GetJobStatus($err->jobID, 'requestCompletedWithContent');
-        } else if ($err->error == ErrorCode::IN_PROGRESS) {
+			try {
+	           $hodClient->GetJobStatus($err->jobID, 'requestCompletedWithContent');
+			}catch (Exception $ex){
+				echo $ex.getMessage();
+			}
+        } else if ($err->error == HODErrorCode::IN_PROGRESS) {
+            error_log("in progress:".$err->jobID);
             sleep(5);
-            $hodClient->GetJobStatus($err->jobID, 'requestCompletedWithContent');
+            try {
+				$hodClient->GetJobStatus($err->jobID, 'requestCompletedWithContent');
+			}catch (Exception $ex){
+				echo $ex.getMessage();
+			}
         } else {
-            echo ("Error code: " . $err->error."</br>Error reason: " . $err->reason . "</br>Error detail: " .  $err->detail . "JobID: " . $err->jobID);
+            $error = "<b>Error:</b></br>";
+            $error .= $resp->error->error . "</br>";
+            $error .= $resp->error->reason . "</br>";
+            $error .= $resp->error->detail . "</br>";
+            echo $error;
         }
-    }
-    else {
+    } elseif ($resp->status == "finished") {
         $result = "";
-        $textBlocks = $response->text_block;
+        $textBlocks =  $resp->payloadObj->text_block;
         for ($i = 0; $i < count($textBlocks); $i++) {
             $block = $textBlocks[$i];
             $result .= "<html><body><p>";
@@ -52,5 +66,9 @@ $paramArr = array(
     'file' => "0005r005.gif",
     'mode' => "document_photo"
 );
-$hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, REQ_MODE::ASYNC, 'requestCompletedWithJobId');
+try {
+	$hodClient->PostRequest($paramArr, HODApps::OCR_DOCUMENT, true, 'requestCompletedWithJobId');
+}catch (Exception $ex){
+	echo $ex.getMessage();
+}
 ?>
