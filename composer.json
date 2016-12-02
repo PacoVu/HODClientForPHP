@@ -1,7 +1,7 @@
 {
   "name": "havenondemand/havenondemand",
   "description": "This library allows you to quickly and easily make requests to Haven OnDemand's APIs.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/HPE-Haven-OnDemand/havenondemand-php",
   "license": "MIT",
   "keywords": ["HavenOnDemand", "havenondemand", "machine learning", "haven", "ondemand"],
